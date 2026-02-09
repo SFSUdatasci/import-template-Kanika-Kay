@@ -40,7 +40,7 @@ Quarto runs R in the same way as a script: objects only exist after the chunks t
 Using `here()` is a convenient way to build paths relative to your project root (e.g., your `.qmd` might live in `scripts/` while data lives in `data/`).
 
 ```{r}
-bg_chem <- read_csv(here::here("data", "BGchem2008data.csv"))
+bg_chem <- read_csv(here::here("Data/Raw Data", "BGchem2008data.csv"))
 ```
 
 (Optional) Quick peek at the data:
@@ -104,3 +104,8 @@ In this mini-analysis, we:
 -   Created a basic plot relating total nitrogen to phosphate
 
 This is the core idea of **literate analysis**: combine narrative and code in one document so the workflow is easier to understand and reproduce.
+
+## Paragraph about Redfield Ratio "About the Data" 
+The Redfield ratio is supposed to be 16:1 but the calculated mean is about 6. This indicates that there is some data that is either incorrect, included in error, or an outlier that needs to be cleaned. California's ratio is about 18:1 and a nutrient-poor ocean is 28:1. This would indicate that while 16:1 is the ideal, anything less than that is virtually not possible in nature. This bolsters my claim that there is something wrong with our data and it needs to be cleaned.  
+## Paragraph about Redfield Plot 
+The plot shows that there is a linear trend across the ocean water samples. It shows a clear, linear ratio between phosphate and total nitrogen. There are also some values that are outliers in terms of the linear trend. Those values would skew the slope of the linear trend and should be removed to get a more accurate sense of the data. Cleaning the data would get rid of those outliers. 
