@@ -1,0 +1,27 @@
+---
+title: "Kanika Kolpe"
+Date: 3/2/2026
+format: html
+---
+
+##Introduction
+This is the metadata from my first field collection for my project. It includes the sample ID, date, desert, site ID, longitude, latitude, county, state, time, and elevation. 
+
+## Data (where you import the data and view it, to see if it is tidy)
+I put my data in the Raw Data folder 
+```{r}
+library(readr)
+site_metadata <- read_csv("Data/Raw Data/site_metadata.csv")
+View(site_metadata)
+
+```
+
+
+##Analysis (where you comment on whether or not it is tidy and if it has primary and foreign keys)
+
+My data is not tidy. 
+My data does not have any primary or foreign keys. 
+
+
+##Conclusion (a short summary)
+My data is not tidy because there are a lot of empty rows. If I get rid of those empty rows it would be tidier. There are also four columns for coordinates when there can be one or two. My data is metadata so there is no need for primary or foreign keys. There's nothing to reference.
