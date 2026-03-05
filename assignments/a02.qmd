@@ -20,7 +20,8 @@ View(site_metadata)
 ##Analysis (where you comment on whether or not it is tidy and if it has primary and foreign keys)
 
 My data is not tidy. 
-My data does not have any primary or foreign keys because it is metadata so it includes everything. 
+My data does not have any primary or foreign keys. 
 
 
 ##Conclusion (a short summary)
+My data is not tidy because there are a lot of empty rows. If I get rid of those empty rows it would be tidier. There are also four columns for coordinates when there can be one or two. My data is metadata so there is no need for primary or foreign keys. There's nothing to reference. 
