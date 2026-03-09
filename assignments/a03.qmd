@@ -193,7 +193,7 @@ mean_region <- catch_original %>%
 #this is arranging by descending order 
   arrange(desc(mean_catch))
 
-#this is getting the top 3 rows of the table 
+#this is getting the top 3 rows of the table with the columns
 head(mean_region)
 ```
 
