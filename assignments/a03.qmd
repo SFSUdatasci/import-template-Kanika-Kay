@@ -1,0 +1,199 @@
+---
+title: "Assignment 3"
+date: 3/9/26
+  format:
+  html:
+    toc: true
+    toc-depth: 3
+execute:
+  warning: false
+  message: false
+---
+
+```{r message=FALSE, warning=FALSE}
+library(dplyr)
+library(tidyr)
+library(readr)
+```
+
+```{r}
+catch_original <- read.csv(url("https://knb.ecoinformatics.org/knb/d1/mn/v2/object/df35b.302.1", method = "libcurl"))
+         
+```
+
+```{r}
+# prints column names of data frame
+colnames(catch_original)
+
+#first 6 lines of data frame
+head(catch_original)
+
+#summary of each column of data
+summary(catch_original)
+
+#prints unique values in a column 
+unique(catch_original$Region)
+
+#opens data frame in its own tab
+#View(catch_original)
+
+```
+
+```{r}
+catch_data <- catch_original %>% 
+  select(Region, Year, Chinook, Sockeye, Coho, Pink, Chum)
+
+head(catch_data)
+
+catch_data <- catch_original %>% 
+  select(-All, -notesRegCode)
+
+```
+
+```{r}
+dplyr::glimpse(catch_data)
+```
+
+```{r}
+catch_clean <- catch_data %>% 
+  mutate(Chinook = as.numeric(Chinook))
+head(catch_clean)
+
+i <- which(is.na(catch_clean$Chinook))
+i
+
+catch_data[i,]
+
+catch_clean <- catch_data %>% 
+  mutate(Chinook = if_else(condition = Chinook == "I", 
+                           true="1",
+                           false=Chinook),
+         Chinook = as.numeric(Chinook))
+catch_clean[i,]
+
+```
+
+```{r}
+catch_long <- catch_clean %>% 
+  #pivot longer all columns 
+  pivot_longer(
+    cols = -c(Region,Year),
+    names_to = "species",
+    values_to = "catch"
+  )
+
+head(catch_long)
+
+catch_wide <- catch_long %>% 
+  pivot_wider(names_from = species, 
+              values_from = catch)
+
+head(catch_wide)
+```
+
+```{r}
+catch_long <- catch_long %>% 
+  rename(catch_thousands = catch)
+head(catch_long)
+
+```
+
+
+```{r}
+catch_long <- catch_long %>% 
+  mutate(catch = catch_thousands*1000)
+head(catch_long)
+catch_long <- catch_long %>% 
+  mutate(catch = catch_thousands*1000) %>% 
+  select(-catch_thousands)
+head(catch_long)
+
+```
+
+```{r}
+unique(catch_original$Region)
+mean_region <- catch_long %>% 
+  group_by(Region) %>% 
+  summarize(mean_catch = mean(catch))
+head(mean_region)
+
+n_region <- catch_long %>% 
+  group_by(Region) %>% 
+  summarize(n=n())
+head(n_region)
+```
+
+```{r}
+sse_catch <- catch_long %>% 
+  filter(Region == "SSE")
+head(sse_catch)
+```
+
+```{r}
+mean_region <- catch_long %>% 
+  group_by(Region) %>% 
+  summarize(mean_catch = mean(catch)) %>% 
+  arrange(mean_catch)
+
+head(mean_region)
+
+mean_region <- catch_long %>% 
+  group_by(Region) %>% 
+  summarize(mean_catch = mean(catch)) %>% 
+  arrange(desc(mean_catch))
+head(mean_region)
+
+```
+
+```{r}
+sites_df <- data.frame(site=c("HAW-101",
+                              "HAW-103",
+                              "OAH-320",
+                              "OAH-219",
+                              "MAU-039"))
+sites_df %>% 
+  separate(site,c("island", "site_number"), "-")
+dates_df <- data.frame(
+  year = c("1930",
+           "1930",
+           "1930"),
+  month = c("12",
+            "12",
+            "12"),
+  day = c("14",
+          "15",
+          "16")
+)
+
+dates_df %>% 
+  unite(date,year,month,day,sep="-")
+```
+
+```{r}
+#this "downloads" the data into R to read. we assigned it the name catch_original
+catch_original <- read_csv("https://knb.ecoinformatics.org/knb/d1/mn/v2/object/df35b.302.1")
+
+#this is to get the mean of the region 
+mean_region <- catch_original %>%
+#this is to select regions, excluding everything that isn't 
+    select(-All, -notesRegCode) %>% 
+#this is mutating the data so it only includes chinook 
+  mutate(Chinook = if_else(Chinook == "I", "1", Chinook)) %>% 
+#this is turning it into a numeric variable 
+    mutate(Chinook = as.numeric(Chinook)) %>% 
+#this is changing the data to be longer
+    pivot_longer(-c(Region, Year), 
+               names_to = "species", 
+               values_to = "catch") %>%
+  mutate(catch = catch*1000) %>% 
+#this is grouping by region 
+  group_by(Region) %>% 
+#this is summarizing the mean catch 
+  summarize(mean_catch = mean(catch)) %>%
+#this is arranging by descending order 
+  arrange(desc(mean_catch))
+
+#this is getting the top 3 rows of the table 
+head(mean_region)
+```
+
