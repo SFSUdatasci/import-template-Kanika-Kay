@@ -181,7 +181,7 @@ mean_region <- catch_original %>%
   mutate(Chinook = if_else(Chinook == "I", "1", Chinook)) %>% 
 #this is turning it into a numeric variable 
     mutate(Chinook = as.numeric(Chinook)) %>% 
-#this is changing the data to be longer
+#this is changing the data to be longer table-wise
     pivot_longer(-c(Region, Year), 
                names_to = "species", 
                values_to = "catch") %>%
