@@ -190,7 +190,7 @@ mean_region <- catch_original %>%
   group_by(Region) %>% 
 #this is summarizing the mean catch 
   summarize(mean_catch = mean(catch)) %>%
-#this is arranging by descending order 
+#this is arranging by descending order by mean
   arrange(desc(mean_catch))
 
 #this is getting the top 3 rows of the table with the columns
