@@ -1,0 +1,119 @@
+---
+title: "R Practice: Tidy Data and Joins"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+execute:
+  warning: false
+  message: false
+---
+
+```{r}
+library(readr)
+library(dplyr)
+library(here)
+library(lubridate) # for bonus question
+
+```
+
+## Introduction (why the reader should care about the data and your analyses)
+My data is about bird observations per park. It is important to know how many birds there are in the area in order to ensure that the populations are staying stable. Analyzing the data will show us data about specific parks so they can ensure proper practices to keep the populations healthy. 
+
+## Data (where you import the data and document its source) 
+```{r}
+bird_observations <- read_csv(here::here("Data/Raw Data/52_pp52_birds_1.csv"))
+surveys <- read_csv(here::here("Data/Raw Data/52_pp52_surveys_1.csv"))
+sites <- read_csv(here::here("Data/Raw Data/52_pp52_sites_1.csv"))
+taxalist <- read_csv(here::here("Data/Raw Data/52_pp52_taxalist_1.csv"))
+
+```
+## Analysis (where you do the analysis described above)
+
+```{r}
+dim(bird_observations)
+head(bird_observations)
+glimpse(bird_observations)
+summary(bird_observations)
+names(bird_observations)
+unique(bird_observations$species_id)
+```
+
+```{r}
+birds_subset <- bird_observations %>% 
+  filter(species_id %in% c("BHCO", "RWBL")) %>% 
+  filter(site_id %in% c("LI-W", "NU-C"))
+```
+
+
+```{r}
+birds_left <- birds_subset %>% 
+  left_join(y = sites, by = "site_id")
+
+birds_left <- left_join(x = birds_subset, y = sites, by = "site_id")
+```
+
+```{r}
+birds_full <- birds_subset %>% 
+  full_join(y = sites, by = "site_id")
+
+birds_full <- full_join(x=birds_subset, y=sites, by = "site_id") 
+
+```
+
+```{r}
+birds_inner <- birds_subset %>% 
+  inner_join(y = taxalist, by = "species_id")
+
+birds_inner <- inner_join(x = birds_subset, y = taxalist, by = "species_id" )
+```
+
+```{r}
+birds_inner_left <- birds_subset %>% 
+  left_join(y = taxalist, by = "species_id")
+
+birds_inner_left <- left_join(x = birds_subset, y = taxalist, by = "species_id")
+```
+
+```{r}
+bird_observations <- bird_observations %>% 
+  rename(bird_obs_notes = notes)
+```
+
+```{r}
+bird_obs_subset <- bird_observations %>% 
+  full_join(y = taxalist, by = "species_id") %>% 
+  full_join(y = sites, by = "site_id") %>% 
+  full_join(y = surveys, by = c("site_id", "survey_id")) %>%  
+  select(survey_date, common_name, park_name, bird_count, observer)
+```
+
+```{r}
+unique(bird_obs_subset$observer)
+```
+
+```{r}
+bird_obs_subset <- bird_obs_subset %>% 
+  mutate(observer = if_else(condition = observer == "Josh Burns", 
+                            true = "J. Burns", 
+                            false = observer))
+
+unique(bird_obs_subset$observer)
+```
+
+```{r}
+bird_obs_subset$survey_month <- lubridate::month(bird_obs_subset$survey_date)
+
+bird_obs_subset %>% mutate(survey_month = as.factor(survey_month))
+
+bird_obs_subset %>% dplyr::relocate(survey_month, .after = survey_date)
+
+filter(bird_obs_subset, park_name == 'Lino' & park_name == 'Orme' & park_name == 'Palomino' & park_name == 'Sonrisa')
+
+summarise(bird_obs_subset, .by = bird_count)
+
+```
+
+## Summary
+My final data frame's outcome is not as I expected given the code I wrote. I think I filtered incorrectly and that caused it to show up as is. I believe it isn't informative because it just gives the month and the count. I expected it to have a summary of all of the months with their parks and the count. To improve, I would fix the summarizing code and maybe also the filtering code. 
+
