@@ -1,0 +1,152 @@
+---
+title: "a05"
+format: html
+---
+
+## Introduction 
+This is the Socioecological Monitoring of the Sacramento-San Joaquin Delta. The data collected is at different locations along the delta and types of visitors at said locations. The analysis compiles this data together for ease of interpretation via visualizing the data. 
+
+
+
+```{r, warning = FALSE, message=FALSE}
+library(readr)
+library(dplyr)
+library(tidyr)
+library(forcats) # makes working with factors easier
+library(ggplot2)
+library(leaflet) # interactive maps
+library(DT) # interactive tables
+library(scales) # scale functions for visualization
+library(janitor) # expedite cleaning and exploring data
+library(viridis) # colorblind friendly color palette
+```
+
+```{r}
+# read in data from the data directory after manually downloading data 
+delta_visits_raw <- read_csv(here::here("data/Socioecological_monitoring_data.csv"))
+
+## Check out column names
+
+colnames(delta_visits_raw)
+
+## Peak at each column and class
+glimpse(delta_visits_raw)
+
+## From when to when
+range(delta_visits_raw$Date)
+
+## Which time of day?
+unique(delta_visits_raw$Time_of_Day)
+```
+
+```{r}
+delta_visits <- delta_visits_raw %>% 
+    janitor::clean_names()
+colnames(delta_visits)
+```
+
+```{r}
+visits_long <- delta_visits %>% 
+    pivot_longer(cols = c(sm_boat, med_boat, lrg_boat, bank_angler, scientist, cars),
+                 names_to = "visitor_type",
+                 values_to = "quantity") %>%
+    rename(restore_loc = eco_restore_approximate_location) %>% 
+    select(-notes)
+
+## Checking the outcome
+head(visits_long)
+```
+
+```{r}
+daily_visits_loc <- visits_long %>%
+    group_by(restore_loc, date, visitor_type) %>% 
+    summarise(daily_visits = sum(quantity))
+    
+head(daily_visits_loc)
+```
+
+```{r}
+daily_visits_totals <- daily_visits_loc %>% 
+    group_by(restore_loc) %>%
+    mutate(n = sum(daily_visits)) %>% 
+    ungroup() %>%
+    mutate(restore_loc = fct_reorder(restore_loc, n))
+
+head(daily_visits_totals)
+```
+
+```{r}
+levels(daily_visits_totals$restore_loc) ### not alphabetical any more!
+```
+
+```{r}
+#making the plot 
+facet_plot <- ggplot(data = daily_visits_totals,
+#naming the plot facet_plot and assigning the data
+       aes(x = visitor_type, y = daily_visits,
+#assigning the x and y values from the data 
+           fill = visitor_type)) +
+#assigning the "fill" value from the data that makes the bars 
+    geom_col() +
+#making a column graph 
+      facet_wrap(~restore_loc,
+               scales = "free_y",
+               ncol = 5,
+               nrow = 2) +
+#fixing the scale of the graph 
+      scale_fill_viridis_d() +
+#assigning colors
+      labs(x = "Type of visitor",
+         y = "Number of Visits",
+         title = "Total Number of Visits to Delta Restoration Areas",
+         subtitle = "Sum of all visits during study period") +
+#labeling the axes and subtitle 
+    theme_bw() +
+    theme(legend.position = "bottom",
+          axis.ticks.x = element_blank(),
+          axis.text.x = element_blank())
+#assigning the theme, legend, text and ticks position  
+facet_plot
+#printing the plot 
+```
+
+```{r}
+locations <- visits_long %>%
+    distinct(restore_loc, .keep_all = TRUE) %>%
+    select(restore_loc, latitude, longitude)
+
+head(locations)
+```
+
+```{r}
+datatable(locations)
+```
+
+```{r}
+#making the map 
+leaflet(locations) %>%
+#calling the map leaflet (locations)
+    addProviderTiles(providers$Esri.WorldImagery) %>%
+#adding locations 
+    addProviderTiles(providers$CartoDB.PositronOnlyLabels) %>%
+#adding location labels 
+    addCircleMarkers(
+        lng = ~ longitude,
+        lat = ~ latitude,
+        popup = ~ restore_loc,
+        radius = 5,
+#adding the circle markers 
+        fillColor = "salmon",
+        fillOpacity = 1,
+#coloring the circle markers 
+        stroke = TRUE,
+        weight = 0.5,
+        color = "white",
+        opacity = 1)
+#adding the strokes and coloring them 
+
+```
+
+## Discussion
+The graph shows the total number of visits to delta restoration. It separates the data by visitor type and what location it is. The colors correspond to the types of visitors. This shows all of the data in one central graph.
+The map shows the locations that the samples were collected from. The red dots correspond to locations that were sampled. The text is for the cities that are nearby. The map is also interactive. You can zoom in and click on the dots for the location names. 
