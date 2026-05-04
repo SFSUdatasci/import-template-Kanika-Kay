@@ -1,0 +1,9 @@
+---
+title: "decision-log"
+format: html
+---
+
+## Assignment a08 decision log entry
+
+
+document at least two decisions from your analysis. Good candidates: why you chose Alaska Albers for the spatial join, what st_within versus st_intersects would give you, or whether the ggspatial basemap added value.
