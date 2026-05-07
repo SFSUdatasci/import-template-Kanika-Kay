@@ -11,3 +11,5 @@
 .DS_Store
 Thumbs.db
 .positai
+
+**/*.quarto_ipynb
