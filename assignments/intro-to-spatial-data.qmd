@@ -185,8 +185,8 @@ ggplot(data = pop_3857_sf) +
     # higher zoom values are more detailed 
     geom_sf(aes(color = population),
             fill = NA) +
-    scale_color_continuous(low = "darkkhaki",
-                           high =  "firebrick",
+    scale_color_continuous(low = "grey",
+                           high =  "hotpink",
                            labels = comma)
 ```
 

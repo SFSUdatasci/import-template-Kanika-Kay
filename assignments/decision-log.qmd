@@ -4,6 +4,8 @@ format: html
 ---
 
 ## Assignment a08 decision log entry
+# st_within vs st_intersects 
+st_within checks whether one object is "within" the other one completely. st_intersects checks whether the objects have any intersections; in other words, it checks if one object has anything within the other, but not completely. 
 
-
-document at least two decisions from your analysis. Good candidates: why you chose Alaska Albers for the spatial join, what st_within versus st_intersects would give you, or whether the ggspatial basemap added value.
+# did ggspatial basemap add value? 
+I don't believe the ggspatial basemap added any value because it showed us data that we already created using other methods. I feel like it would be more valuable if it helped us visualize the data in a different way but I don't believe that it did. 
